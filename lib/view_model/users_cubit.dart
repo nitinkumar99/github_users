@@ -17,7 +17,7 @@ class UsersCubit extends Cubit<UsersState> {
   }
 
   // fetch from cloud
-  void getUsers() async {
+  Future<void> getUsers() async {
     try {
       if (state is LoadingState) return;
 

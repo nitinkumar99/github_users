@@ -87,7 +87,9 @@ class AllUsersScreenState extends State<AllUsersScreen> {
   Widget get loadingIndicator => const Padding(
         padding: EdgeInsets.all(8.0),
         child: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            key: Key('progress_indicator'),
+          ),
         ),
       );
 

@@ -1,31 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:github_users/view/screens/selected_users_screen.dart';
+import 'package:github_users/main.dart';
+import 'package:github_users/model/repository/base_repository.dart';
+import 'package:github_users/model/repository/repo/users_repository.dart';
 import 'package:github_users/view_model/users_cubit.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockUsersRepositoryImpl extends Mock implements UsersRepository {}
 
 void main() {
-  testWidgets('Users are displayed with avatar and name',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(MultiBlocProvider(providers: [
-      BlocProvider<UsersCubit>(
-        create: (BuildContext context) => UsersCubit(),
-      ),
-    ], child: const ListPageWrapper()));
-    await tester.pump(const Duration(seconds: 2));
+  late MockUsersRepositoryImpl mockUsersRepositoryImpl;
 
-    final carListKey = find.byKey(const Key('user_list'));
-    expect(carListKey, findsOneWidget);
+  setUp(() {
+    mockUsersRepositoryImpl = MockUsersRepositoryImpl();
   });
-}
 
-class ListPageWrapper extends StatelessWidget {
-  const ListPageWrapper({Key? key}) : super(key: key);
+  void checkAndReturnData() {
+    when(() => mockUsersRepositoryImpl.fetchUsers(2)).thenAnswer(
+        (_) async => RepositoryResult([], RepositoryResultSource.server));
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SelectedUsersScreen(),
+  void checkAndReturnDataWithDelay() {
+    when(() => mockUsersRepositoryImpl.fetchUsers(2)).thenAnswer((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+      return RepositoryResult([], RepositoryResultSource.server);
+    });
+  }
+
+  Widget createWidgetUnderTest() {
+    return MaterialApp(
+      title: 'News App',
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<UsersCubit>(
+            create: (BuildContext context) =>
+                UsersCubit(usersRepository: mockUsersRepositoryImpl),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     );
   }
+
+  group("Testing static components", () {
+    testWidgets("Title is shown", (WidgetTester tester) async {
+      checkAndReturnData();
+      await tester.pumpWidget(createWidgetUnderTest());
+      expect(find.text('Github users'), findsOneWidget);
+    });
+
+    testWidgets("Tab bars are shown", (WidgetTester tester) async {
+      checkAndReturnData();
+      await tester.pumpWidget(createWidgetUnderTest());
+      expect(find.text("All Users"), findsOneWidget);
+      expect(find.text("Selected Users"), findsOneWidget);
+    });
+  });
+
+  /* group('Testing of dynamic data', () {
+    testWidgets('Testing of loading indicator', (WidgetTester tester) async {
+      checkAndReturnDataWithDelay();
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byElementType(CircularProgressIndicator), findsOneWidget);
+      await tester.pumpAndSettle();
+    });
+  });*/
 }

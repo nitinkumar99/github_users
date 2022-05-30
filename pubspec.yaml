@@ -45,7 +45,8 @@ dependencies:
 dev_dependencies:
   test:
   bloc_test:
-  mockito:
+  #mockito:
+  mocktail:
   flutter_test:
     sdk: flutter
 
