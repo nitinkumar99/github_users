@@ -23,7 +23,7 @@ class AllUsersScreenState extends State<AllUsersScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       usersCubit = BlocProvider.of<UsersCubit>(context, listen: false);
       usersCubit?.checkAndGetUsers();
     });
@@ -38,6 +38,7 @@ class AllUsersScreenState extends State<AllUsersScreen> {
           return loadingIndicator;
         } else if (state is ErrorState) {
           return const Center(
+            key: Key('no_data_found'),
             child: Text("Unable to load data"),
           );
         }
@@ -65,6 +66,7 @@ class AllUsersScreenState extends State<AllUsersScreen> {
               itemBuilder: (context, index) {
                 if (index < users.length) {
                   return Card(
+                    key: Key('list_element_$index'),
                       child: UserItem(users[index], () {
                     usersCubit?.addRemoveUser(users[index]);
                   }));

@@ -18,6 +18,7 @@ class SelectedUsersScreenState extends State<SelectedUsersScreen> {
 
   get getRemoveAllButton => FloatingActionButton(
         // isExtended: true,
+    key: const Key('remove_all_button'),
         child: const Icon(Icons.delete),
         onPressed: () {
           usersCubit?.deleteAll();
@@ -27,7 +28,7 @@ class SelectedUsersScreenState extends State<SelectedUsersScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       usersCubit = BlocProvider.of<UsersCubit>(context, listen: false);
       usersCubit?.getSelectedUsers();
     });

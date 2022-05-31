@@ -28,7 +28,7 @@ class UserItemState extends State<UserItem> {
           setState(() {
             widget.user.isSelected = value ?? false;
           });
-          WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
             widget.addRemoveUserCallback();
           });
         },

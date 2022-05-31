@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:github_users/main.dart';
 import 'package:github_users/model/repository/base_repository.dart';
 import 'package:github_users/model/repository/repo/users_repository.dart';
+import 'package:github_users/model/user_model.dart';
 import 'package:github_users/view_model/users_cubit.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 class MockUsersRepositoryImpl extends Mock implements UsersRepository {}
 
@@ -16,13 +18,29 @@ void main() {
     mockUsersRepositoryImpl = MockUsersRepositoryImpl();
   });
 
+  var users = [
+    UserModel(
+        login: 'Test 1',
+        id: 1,
+        avatarUrl: 'https://avatars.githubusercontent.com/u/1?v=4'),
+    UserModel(
+        login: 'Test 2',
+        id: 2,
+        avatarUrl: 'https://avatars.githubusercontent.com/u/1?v=4')
+  ];
+
   void checkAndReturnData() {
-    when(() => mockUsersRepositoryImpl.fetchUsers(2)).thenAnswer(
-        (_) async => RepositoryResult([], RepositoryResultSource.server));
+    when(() => mockUsersRepositoryImpl.fetchUsers(1)).thenAnswer(
+        (_) async => RepositoryResult(users, RepositoryResultSource.server));
+  }
+
+  void checkLocalData() {
+    when(() => mockUsersRepositoryImpl.fetchLocalUsers()).thenAnswer(
+        (_) async => RepositoryResult([], RepositoryResultSource.cached));
   }
 
   void checkAndReturnDataWithDelay() {
-    when(() => mockUsersRepositoryImpl.fetchUsers(2)).thenAnswer((_) async {
+    when(() => mockUsersRepositoryImpl.fetchUsers(1)).thenAnswer((_) async {
       await Future.delayed(const Duration(seconds: 2));
       return RepositoryResult([], RepositoryResultSource.server);
     });
@@ -58,13 +76,36 @@ void main() {
     });
   });
 
-  /* group('Testing of dynamic data', () {
+  group('Testing of dynamic data', () {
     testWidgets('Testing of loading indicator', (WidgetTester tester) async {
       checkAndReturnDataWithDelay();
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump(const Duration(milliseconds: 500));
-      expect(find.byElementType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byKey(const Key('progress_indicator')), findsOneWidget);
       await tester.pumpAndSettle();
     });
-  });*/
+
+    testWidgets('Testing of users list in case of error',
+        (WidgetTester tester) async {
+      checkAndReturnData();
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('no_data_found')), findsOneWidget);
+    });
+
+    testWidgets('Testing of users list', (WidgetTester tester) async {
+      await mockNetworkImagesFor(
+          () async {
+            checkAndReturnData();
+            checkLocalData();
+            await tester.pumpWidget(createWidgetUnderTest());
+            await tester.pump(const Duration(milliseconds: 500));
+
+            for (var item in users) {
+              expect(find.text(item.login!), findsOneWidget);
+            }
+          });
+    });
+  });
 }

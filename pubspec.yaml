@@ -47,6 +47,7 @@ dev_dependencies:
   bloc_test:
   #mockito:
   mocktail:
+  network_image_mock: ^2.0.1
   flutter_test:
     sdk: flutter
 
