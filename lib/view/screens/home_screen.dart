@@ -18,11 +18,6 @@ class HomeScreenState extends State<HomeScreen> {
   UsersCubit? usersCubit;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,

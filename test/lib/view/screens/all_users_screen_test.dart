@@ -95,17 +95,16 @@ void main() {
     });
 
     testWidgets('Testing of users list', (WidgetTester tester) async {
-      await mockNetworkImagesFor(
-          () async {
-            checkAndReturnData();
-            checkLocalData();
-            await tester.pumpWidget(createWidgetUnderTest());
-            await tester.pump(const Duration(milliseconds: 500));
+      await mockNetworkImagesFor(() async {
+        checkAndReturnData();
+        checkLocalData();
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pump(const Duration(milliseconds: 500));
 
-            for (var item in users) {
-              expect(find.text(item.login!), findsOneWidget);
-            }
-          });
+        for (var item in users) {
+          expect(find.text(item.login!), findsOneWidget);
+        }
+      });
     });
   });
 }

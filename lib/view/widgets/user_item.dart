@@ -24,6 +24,7 @@ class UserItemState extends State<UserItem> {
       ),
       trailing: Checkbox(
         value: widget.user.isSelected,
+        key: Key(widget.user.id.toString()),
         onChanged: (value) {
           setState(() {
             widget.user.isSelected = value ?? false;

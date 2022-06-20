@@ -51,6 +51,7 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) => RouteGenerator.generateRoute(settings),
       initialRoute: HomeScreen.routeName,
       theme: ThemeData(
+        useMaterial3: false,
         primarySwatch: AppColor.PRIMARY_SWATCH,
         hintColor: AppColor.TEXT_HINT_COLOR,
         splashColor: AppColor.SPLASH_RIPPLE_COLOR.withOpacity(0.2),
